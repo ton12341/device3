@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>สถานะความชื้นจาก Firebase</title>
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background-color: #e6f7ff;
+      text-align: center;
+      padding: 50px;
+    }
+    h1 {
+      color: #00796B;
+    }
+    #humidityDisplay {
+      font-size: 48px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: #00796B;
+    }
+    .status-icon {
+      margin-top: 20px;
+      width: 100px;
+      height: 100px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>ความชื้นสัมพัทธ์ปัจจุบัน</h1>
+  <div id="humidityDisplay">-- %</div>
+  <img id="humidityIcon" class="status-icon" src="" alt="icon">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
+
+  <script>
+    // 🔧 Firebase Config ของคุณ
+    const firebaseConfig = {
+  apiKey: "AIzaSyDhKddDAIVNgsGnDDyY0YbNlJzkyAtPSE4",
+  authDomain: "myiot2-ea76e.firebaseapp.com",
+  projectId: "myiot2-ea76e",
+  storageBucket: "myiot2-ea76e.firebasestorage.app",
+  messagingSenderId: "207422089675",
+  appId: "1:207422089675:web:988416a0e38d8b05be6e4e",
+  measurementId: "G-0ZPJMR7FMM"
+};
+
+
+
+    // 🔌 เริ่ม Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // 📍 ชี้ไปที่ document ที่เก็บความชื้น
+    const docRef = db.collection("devices2").doc("light2");
+
+    const humidityDisplay = document.getElementById("humidityDisplay");
+    const icon = document.getElementById("humidityIcon");
+
+    // 👁‍🗨 ดึงข้อมูลแบบเรียลไทม์
+    docRef.onSnapshot((doc) => {
+      const data = doc.data();
+      if (data && typeof data.humidity === "number") {
+        const hum = data.humidity.toFixed(1);
+        humidityDisplay.textContent = `${hum} %`;
+
+        // เปลี่ยนไอคอนตามระดับความชื้น
+        if (hum < 30) {
+          icon.src = "https://cdn-icons-png.flaticon.com/512/728/728093.png"; // แห้ง
+        } else if (hum < 60) {
+          icon.src = "https://cdn-icons-png.flaticon.com/512/728/728111.png"; // ปกติ
+        } else {
+          icon.src = "https://cdn-icons-png.flaticon.com/512/728/728083.png"; // ชื้น
+        }
+      } else {
+        humidityDisplay.textContent = "ไม่พบข้อมูล";
+        icon.src = "";
+      }
+    });
+  </script>
+
+</body>
+</html>
